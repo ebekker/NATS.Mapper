@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option csharp_namespace = "NATS.Mapper.Server";
+
+package nats_mapper;
+
+// The greeting service definition.
+service Mapper {
+  // Authenticates and Sign Challenge
+  rpc KerberosAuth (KerberosAuthRequest) returns (KerberosAuthReply);
+}
+
+// The request message containing the user's name.
+message KerberosAuthRequest {
+  bytes token = 1;
+  bytes nonce = 2;
+}
+
+// The response message containing the greetings.
+message KerberosAuthReply {
+  string jwt = 1;
+  bytes nonce_signed = 2;
+}
