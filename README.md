@@ -22,6 +22,13 @@ Server to resolve a mapped JWT and subsequently, a signed challenge nonce.
 The NATS Mapper Client can be used to integrate with the official NATS .NET Client in
 order to support the cross-system interaction transparently.
 
+### .NET Core Implementation
+
+The current implementation of client and server are in .NET Core.  While this means that
+only .NET clients are currently supported, additional platforms and languages that are
+supported by NATS can be added in the future, as the native protocol between the client
+and server is gRPC and can be easily adapted to any platform that has gRPC bindings.
+
 ## Supported External Identity Systems
 
 Currently the following External Identity Systems are supported.
@@ -54,3 +61,11 @@ _user_ identities.
 -----
 
 TODO: more details and samples
+
+-----
+
+## Implementation Details
+
+### Kerberos Implementation
+
+[<img src="docs/Kerberos/mapper-design.png" width="800" />](docs/Kerberos/mapper-design.png)
