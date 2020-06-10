@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option csharp_namespace = "NATS.Mapper.Server";
+
+package nats_mapper;
+
+// The service definition for Kerberos Mapper to NATS NKeys.
+service KerberosMapper {
+  // Authenticates against Kerberos and optionally signs a challenge nonce from the NATS server.
+  rpc KerberosAuth (KerberosAuthRequest) returns (KerberosAuthReply);
+}
+
+// The request message containing the user's name and optionally the challenge nonce.
+message KerberosAuthRequest {
+  bytes nonce = 1;
+
+  bytes service_token = 2;
+}
+
+// The response message containing the NKeys JWT and optionally the signed challeng nonce.
+message KerberosAuthReply {
+  string jwt = 1;
+  bytes nonce_signed = 2;
+
+  string identity_name = 3;
+}

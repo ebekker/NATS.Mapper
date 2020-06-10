@@ -5,11 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\NATS.Mapper.Client\Shared\AwsIamConstants.cs" Link="Shared\AwsIamConstants.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Protobuf Include=".\protos\*.proto" GrpcServices="Both" />
     <Protobuf Include="..\NATS.Mapper.Client\protos\*.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AwsSignatureVersion4" Version="1.2.0" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.27.0" />
     <PackageReference Include="Kerberos.NET" Version="4.0.12" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.4" />

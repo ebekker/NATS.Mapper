@@ -1,8 +1,8 @@
 namespace NATS.Mapper.Server.Configuration
 {
-    public class UserMapping
+    public class AwsIamUserMapping
     {
-        public string Name { get; set; }
+        public string Arn { get; set; }
         public string NKey { get; set; }
         public string JWT { get; set; }
     }

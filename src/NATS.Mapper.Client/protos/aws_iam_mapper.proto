@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option csharp_namespace = "NATS.Mapper.Server";
+
+package nats_mapper;
+
+// The service definition for AWS IAM Mapper to NATS NKeys.
+service AwsIamMapper {
+  // Authenticates against AWS IAM and optionally signs a challenge nonce from the NATS server.
+  rpc AwsIamAuth (AwsIamAuthRequest) returns (AwsIamAuthReply);
+}
+
+// The request message containing the AWS IAM sts:GetCallerIdentity details.
+message AwsIamAuthRequest {
+  message HeaderValues {
+    repeated string values = 1;
+  }
+  
+  bytes nonce = 1;
+
+  string sts_amz_iso8601_date = 2;
+  string sts_authorization = 3;
+  map<string, HeaderValues> sts_additional_headers = 4;
+}
+
+// The response message containing the greetings.
+message AwsIamAuthReply {
+  string jwt = 1;
+  bytes nonce_signed = 2;
+
+  string identity_arn = 3;
+}

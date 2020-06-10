@@ -13,55 +13,91 @@ namespace NATS.Mapper.Server
 {
     public static class MapperExtensions
     {
-        // Empty class only used for ILogger category
-        class Log {}
-
         public static IServiceCollection AddNatsMapper(this IServiceCollection services,
             IConfigurationSection config)
         {
             return services.Configure<MapperConfiguration>(config);
         }
 
-        public static GrpcServiceEndpointConventionBuilder MapNatsMapper(this IEndpointRouteBuilder builder)
+        public static GrpcServiceEndpointConventionBuilder MapNatsKerberosMapper(this IEndpointRouteBuilder builder)
         {
             var services = builder.ServiceProvider;
             var logger = services.GetRequiredService<ILogger<MapperExtensions.Log>>();
             var config = services.GetRequiredService<IOptionsMonitor<MapperConfiguration>>().CurrentValue;
             
-            bool valid = true;
-            if (string.IsNullOrEmpty(config.Spn))
-            {
-                valid = false;
-                logger.LogError("Missing or invalid SPN in Mapper configuration");
-            }
-            
-            if (string.IsNullOrEmpty(config.Realm))
-            {
-                valid = false;
-                logger.LogError("Missing or invalid Realm in Mapper configuration");
-            }
+            var kerberosMapping = config.KerberosMapping;
+            bool valid = kerberosMapping != null;
 
-            if (string.IsNullOrEmpty(config.Password))
+            if (!valid)
             {
-                valid = false;
-                logger.LogError("Missing or invalid Password in Mapper configuration");
+                logger.LogError("Kerberos mapping configuration is missing");
             }
+            else
+            {
+                if (string.IsNullOrEmpty(kerberosMapping.Spn))
+                {
+                    valid = false;
+                    logger.LogError("Missing or invalid SPN in Mapper configuration");
+                }
+                
+                if (string.IsNullOrEmpty(kerberosMapping.Realm))
+                {
+                    valid = false;
+                    logger.LogError("Missing or invalid Realm in Mapper configuration");
+                }
 
+                if (string.IsNullOrEmpty(kerberosMapping.Password))
+                {
+                    valid = false;
+                    logger.LogError("Missing or invalid Password in Mapper configuration");
+                }
+            }
             if (!valid)
                 throw new Exception("Mapping configuration is invalid or incomplete");
 
 
-            if (config.Users == null || config.Users.Count() == 0)
+            if (kerberosMapping.Users == null || kerberosMapping.Users.Count() == 0)
             {
-                logger.LogWarning("Mapper configuration user mapping is missing or empty");
+                logger.LogWarning("NATS Kerberos user mapping configuration is missing or empty");
                 logger.LogWarning(@"
-                    ******************************************
-                    ***** NO USERS CAN BE AUTHENTICATED! *****
-                    ******************************************
+                    *********************************************************
+                    ***** NO USERS CAN BE AUTHENTICATED USING KERBEROS! *****
+                    *********************************************************
                     ");
             }
 
-            return builder.MapGrpcService<MapperService>();
+            return builder.MapGrpcService<KerberosMapperService>();
         }
-    }
+
+        public static GrpcServiceEndpointConventionBuilder MapNatsAwsIamMapper(this IEndpointRouteBuilder builder)
+        {
+            var services = builder.ServiceProvider;
+            var logger = services.GetRequiredService<ILogger<MapperExtensions.Log>>();
+            var config = services.GetRequiredService<IOptionsMonitor<MapperConfiguration>>().CurrentValue;
+            
+            var awsIamMapping = config.AwsIamMapping;
+            bool valid = awsIamMapping != null;
+
+            if (awsIamMapping == null)
+            {
+                logger.LogError("AWS IAM mapping configuration is missing");
+                throw new Exception("Mapping configuration is invalid or incomplete");
+            }
+
+            if (awsIamMapping.Users == null || awsIamMapping.Users.Count() == 0)
+            {
+                logger.LogWarning("NATS Kerberos user mapping configuration is missing or empty");
+                logger.LogWarning(@"
+                    ********************************************************
+                    ***** NO USERS CAN BE AUTHENTICATED USING AWS IAM! *****
+                    ********************************************************
+                    ");
+            }
+
+            return builder.MapGrpcService<AwsIamMapperService>();
+        }
+ 
+         // Empty class only used for ILogger category
+        class Log {}
+   }
 }
