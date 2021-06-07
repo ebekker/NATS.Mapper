@@ -3,6 +3,8 @@
 
 Solution for authenticating and mapping external credentials to NATS NKeys.
 
+:star: I appreciate your star, it helps me decide to which OSS projects I should allocate my spare time.
+
 -----
 
 ## Overview
